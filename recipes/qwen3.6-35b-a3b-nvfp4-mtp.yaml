@@ -35,6 +35,7 @@ command: |
   vllm serve nvidia/Qwen3.6-35B-A3B-NVFP4 \
     --host {host} \
     --port {port} \
+    --quantization modelopt_fp4 \
     --max-model-len {max_model_len} \
     --max-num-batched-tokens {max_num_batched_tokens} \
     --gpu-memory-utilization {gpu_memory_utilization} \

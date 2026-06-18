@@ -1,15 +1,13 @@
-# Recipe: nvidia/Qwen3.6-35B-A3B-NVFP4
-# nvidia/Qwen3.6-35B-A3B model in NVFP4 format
-
+# Recipe: RedHatAI/Qwen3.6-35B-A3B-NVFP4
+# Based on: https://stevescargall.com/blog/2026/04/vllm-recipe-redhatai/qwen3.6-35b-a3b-nvfp4-on-dgx-spark/
+# RedHatAI NVFP4 quantization uses compressed-tensors format
 
 recipe_version: "1"
 name: Qwen36-35B-A3B-NVFP4
-description: vLLM serving Qwen3.6-35B-A3B-NVFP4
+description: vLLM serving Qwen3.6-35B-A3B-NVFP4 (RedHatAI compressed-tensors)
 
 # HuggingFace model to download (optional, for --download-model)
-model: nvidia/Qwen3.6-35B-A3B-NVFP4
-
-#solo_only: true
+model: RedHatAI/Qwen3.6-35B-A3B-NVFP4
 
 # Container image to use
 container: vllm-node
@@ -22,33 +20,31 @@ defaults:
   port: 8000
   host: 0.0.0.0
   tensor_parallel: 2
-  gpu_memory_utilization: 0.7
-  max_model_len: 262144
-  max_num_batched_tokens: 16384
-
-# Environment variables
-env:
-  VLLM_NVFP4_GEMM_BACKEND: cutlass
+  gpu_memory_utilization: 0.85
+  max_model_len: 131072
+  max_num_seqs: 32
+  max_num_batched_tokens: 32768
 
 # The vLLM serve command template
 command: |
-  vllm serve nvidia/Qwen3.6-35B-A3B-NVFP4 \
+  vllm serve RedHatAI/Qwen3.6-35B-A3B-NVFP4 \
     --host {host} \
     --port {port} \
-    --quantization modelopt_fp4 \
+    --quantization compressed-tensors \
+    --language-model-only \
+    --moe-backend flashinfer_cutlass \
     --max-model-len {max_model_len} \
+    --max-num-seqs {max_num_seqs} \
     --max-num-batched-tokens {max_num_batched_tokens} \
     --gpu-memory-utilization {gpu_memory_utilization} \
-    --enable-auto-tool-choice \
-    --tool-call-parser qwen3_xml \
-    --kv-cache-dtype fp8 \
-    --load-format fastsafetensors \
-    --attention-backend flashinfer \
-    --moe-backend flashinfer_cutlass \
-    --disable-custom-all-reduce \
-    --trust-remote-code \
+    --kv-cache-dtype fp8_e4m3 \
+    --enable-chunked-prefill \
     --enable-prefix-caching \
+    --trust-remote-code \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_coder \
+    --reasoning-parser qwen3 \
     --chat-template fixed_chat_template.jinja \
     -tp {tensor_parallel} \
     --distributed-executor-backend ray \
-    --speculative-config '{{"method": "mtp", "num_speculative_tokens": 3, "moe_backend": "triton"}}'
+    --speculative-config '{{"method": "mtp", "num_speculative_tokens": 1, "moe_backend": "triton"}}'

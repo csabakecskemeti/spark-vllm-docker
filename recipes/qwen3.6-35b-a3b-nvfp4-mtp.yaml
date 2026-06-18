@@ -20,10 +20,9 @@ defaults:
   port: 8000
   host: 0.0.0.0
   tensor_parallel: 2
-  gpu_memory_utilization: 0.80
-  max_model_len: 131072
-  max_num_seqs: 32
-  max_num_batched_tokens: 32768
+  gpu_memory_utilization: 0.7
+  max_model_len: 262144
+  max_num_batched_tokens: 16384
 
 # The vLLM serve command template
 command: |
@@ -34,7 +33,6 @@ command: |
     --language-model-only \
     --moe-backend flashinfer_cutlass \
     --max-model-len {max_model_len} \
-    --max-num-seqs {max_num_seqs} \
     --max-num-batched-tokens {max_num_batched_tokens} \
     --gpu-memory-utilization {gpu_memory_utilization} \
     --kv-cache-dtype fp8_e4m3 \

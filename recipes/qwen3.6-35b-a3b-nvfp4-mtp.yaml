@@ -44,7 +44,7 @@ command: |
     --kv-cache-dtype fp8 \
     --load-format fastsafetensors \
     --attention-backend flashinfer \
-    --moe-backend cutlass \
+    --moe-backend flashinfer_cutlass \
     --disable-custom-all-reduce \
     --trust-remote-code \
     --enable-prefix-caching \

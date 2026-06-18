@@ -44,9 +44,8 @@ command: |
     --kv-cache-dtype fp8 \
     --load-format fastsafetensors \
     --attention-backend flashinfer \
-    --moe-backend marlin \
     --enable-prefix-caching \
     --chat-template fixed_chat_template.jinja \
     -tp {tensor_parallel} \
     --distributed-executor-backend ray \
-    --speculative-config '{{"method": "mtp", "num_speculative_tokens": 3}}'
+    --speculative-config '{{"method": "mtp", "num_speculative_tokens": 3, "moe_backend": "triton"}}'

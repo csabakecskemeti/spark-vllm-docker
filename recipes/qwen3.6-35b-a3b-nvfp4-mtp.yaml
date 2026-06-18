@@ -28,14 +28,13 @@ defaults:
 
 # Environment variables
 env:
-  VLLM_MARLIN_USE_ATOMIC_ADD: 1
+  VLLM_NVFP4_GEMM_BACKEND: cutlass
 
 # The vLLM serve command template
 command: |
   vllm serve nvidia/Qwen3.6-35B-A3B-NVFP4 \
     --host {host} \
     --port {port} \
-    --quantization modelopt \
     --max-model-len {max_model_len} \
     --max-num-batched-tokens {max_num_batched_tokens} \
     --gpu-memory-utilization {gpu_memory_utilization} \
@@ -44,6 +43,9 @@ command: |
     --kv-cache-dtype fp8 \
     --load-format fastsafetensors \
     --attention-backend flashinfer \
+    --moe-backend cutlass \
+    --disable-custom-all-reduce \
+    --trust-remote-code \
     --enable-prefix-caching \
     --chat-template fixed_chat_template.jinja \
     -tp {tensor_parallel} \
